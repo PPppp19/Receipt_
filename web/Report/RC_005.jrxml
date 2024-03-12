@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.10.0.final using JasperReports Library version 6.10.0-unknown  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RC_005" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7e62701e-9e3c-4d27-be8a-63fa24a892c1">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="M3"/>
+	<property name="ireport.jasperserver.url" value="http://192.200.9.124:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/Jilasak_Few/DailyCashTracking/Chq_Clearing_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/Jilasak_Few/DailyCashTracking/Chq_Clearing"/>
+	<parameter name="cono" class="java.lang.String">
+		<defaultValueExpression><![CDATA[10]]></defaultValueExpression>
+	</parameter>
+	<parameter name="divi" class="java.lang.String">
+		<defaultValueExpression><![CDATA[101]]></defaultValueExpression>
+	</parameter>
+	<parameter name="from_date" class="java.lang.String">
+		<defaultValueExpression><![CDATA[20221001]]></defaultValueExpression>
+	</parameter>
+	<parameter name="to_date" class="java.lang.String">
+		<defaultValueExpression><![CDATA[20221010]]></defaultValueExpression>
+	</parameter>
+	<parameter name="year" class="java.lang.String">
+		<defaultValueExpression><![CDATA[2022]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT E.*,F.COMPNAME
+FROM (
+SELECT A.EGCONO,A.EGDIVI,A.EGACDT
+,B.ESVONO,B.ESPYNO,D.OKCUNM,C.DMBKID,C.DMDRRN,SUBSTRING(C.DMDUDT,7,2) || '/' || SUBSTRING(C.DMDUDT,5,2) || '/' || SUBSTRING(C.DMDUDT,1,4) AS DMDUDT,C.DMCUAM
+FROM M3FDBPRD.FGLEDG A,M3FDBPRD.FSLEDG B,M3FDBPRD.FDRFMA C,M3FDBPRD.OCUSMA D
+WHERE A.EGCONO =  $P{cono} 
+AND A.EGDIVI =   $P{divi} 
+AND A.EGTRCD = 20
+AND A.EGYEA4 = $P{year} 
+AND A.EGACDT BETWEEN  $P{from_date}  and   $P{to_date} 
+AND A.EGCONO = B.ESCONO
+AND A.EGDIVI = B.ESDIVI
+AND A.EGYEA4 = B.ESYEA4
+AND A.EGJRNO = B.ESJRNO
+AND A.EGJSNO = B.ESJSNO
+AND A.EGAIT7 = 'AR30-195'
+AND B.ESCONO = C.DMCONO
+AND B.ESDIVI = C.DMDIVI
+AND B.ESPYNO = C.DMPYNO
+AND B.ESCINO = C.DMCINO
+AND B.ESINYR = C.DMINYR
+AND C.DMCONO = D.OKCONO
+AND C.DMPYNO = D.OKCUNO
+) E LEFT JOIN (
+SELECT CCCONO,CCDIVI,TRIM(CCROW3) AS COMPNAME 
+FROM M3FDBPRD.CMNDIV 
+WHERE CCDIVI NOT IN ('','130','120')
+) F ON F.CCCONO = E.EGCONO AND F.CCDIVI = E.EGDIVI
+ORDER BY E.ESVONO,E.DMDUDT,E.DMBKID ASC
+]]>
+	</queryString>
+	<field name="EGCONO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EGCONO"/>
+	</field>
+	<field name="EGDIVI" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EGDIVI"/>
+	</field>
+	<field name="EGACDT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EGACDT"/>
+	</field>
+	<field name="ESVONO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ESVONO"/>
+	</field>
+	<field name="ESPYNO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ESPYNO"/>
+	</field>
+	<field name="OKCUNM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="OKCUNM"/>
+	</field>
+	<field name="DMBKID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DMBKID"/>
+	</field>
+	<field name="DMDRRN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DMDRRN"/>
+	</field>
+	<field name="DMDUDT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="DMDUDT"/>
+	</field>
+	<field name="DMCUAM" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="DMCUAM"/>
+	</field>
+	<field name="COMPNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="COMPNAME"/>
+	</field>
+	<variable name="DMCUAM1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{DMCUAM}]]></variableExpression>
+	</variable>
+	<variable name="AMT_VONO" class="java.math.BigDecimal" resetType="Group" resetGroup="VONO" calculation="Sum">
+		<variableExpression><![CDATA[$F{DMCUAM}]]></variableExpression>
+	</variable>
+	<variable name="DMCUAM2" class="java.math.BigDecimal" resetType="Group" resetGroup="Date" calculation="Sum">
+		<variableExpression><![CDATA[$F{DMCUAM}]]></variableExpression>
+	</variable>
+	<group name="Date" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{EGACDT}]]></groupExpression>
+		<groupFooter>
+			<band height="14">
+				<textField pattern="#,##0.00#">
+					<reportElement x="477" y="0" width="76" height="14" uuid="f0517aa3-061d-440e-a913-a18faadd5d6a">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{DMCUAM2}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="555" height="14" uuid="beb7bc64-f961-4018-9f84-69669cbee351">
+						<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Left">
+						<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+						<paragraph leftIndent="5"/>
+					</textElement>
+					<text><![CDATA[Total By Date :]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="VONO">
+		<groupExpression><![CDATA[$F{ESVONO}]]></groupExpression>
+		<groupFooter>
+			<band height="14">
+				<textField pattern="#,##0.00">
+					<reportElement x="477" y="0" width="78" height="14" uuid="6e780009-8d6b-4c4e-b245-30312d1edb7e"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{AMT_VONO}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="555" height="14" uuid="c89e5262-115d-4775-9a4e-d6086de7bf85">
+						<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Left">
+						<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+						<paragraph leftIndent="5"/>
+					</textElement>
+					<text><![CDATA[Total By Voucher :]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="76" splitType="Stretch">
+			<textField>
+				<reportElement x="77" y="0" width="400" height="30" uuid="e5e4a379-24a9-4a00-8a2c-5e2844c43ac6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMPNAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="490" y="0" width="66" height="30" uuid="e10ba006-dfb0-4155-a559-efcee1db7753"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RC_005]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="77" y="30" width="400" height="20" uuid="d9a1f234-5fda-4050-952f-ab4bf4e1d23f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Daily Cheque Clearing  Report]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToBandHeight" x="77" y="50" width="400" height="20" uuid="a54741dc-409a-42dd-9d50-a93783741b9b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0a274f9c-73ac-4131-a262-751d346661b2"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["For the Date : " + $F{EGACDT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="65" height="20" uuid="b4409e0c-66d9-4c03-a4a8-cf2c4099958e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0a274f9c-73ac-4131-a262-751d346661b2"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="65" y="0" width="55" height="20" uuid="4e361f4d-4c7e-4b0e-83f1-4b714685757f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3b754fa8-5eb3-4832-a15a-88028a44d4be"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Voucher No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="297" y="0" width="50" height="20" uuid="f5d18d60-daa2-425d-9912-64c2e56ae22c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6aca091f-4d9c-459c-9dce-912d3f8e8896"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Bank]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="477" y="0" width="78" height="20" uuid="aab59c9b-ec34-48d7-8062-cdf7e2024e39">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a2b4293f-719e-4381-9071-6a35f2ecfacc"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="0" width="60" height="20" uuid="0b5bcd65-4dc7-4751-9dc4-c890ef8a24e1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce6424ae-17c7-4b3b-9cb5-8b9e0cfa8cfe"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Payer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="412" y="0" width="65" height="20" uuid="eff0cba9-395a-430e-a3ed-ff26000bd16f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a69ab44d-e01a-4ab9-8951-f30f2c906181"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Chq. Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="347" y="0" width="65" height="20" uuid="b1c8ac60-201d-4347-93ea-f527b53a8171">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="47627797-7d44-4094-9942-0a284a49fdfb"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Chq. No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="0" width="117" height="20" uuid="e9f3b001-5ad9-4dbe-ad20-40a9e7b28d72">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="63e1541b-e751-411b-959c-b3cabdb63f20"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Payer Name]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="65" height="20" uuid="88cb3b8e-e161-4495-b47b-436fe9504b5d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0a274f9c-73ac-4131-a262-751d346661b2"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EGACDT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToBandHeight" x="65" y="0" width="55" height="20" uuid="b9d9dd83-143b-4906-bd9c-1a73e24d757a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3b754fa8-5eb3-4832-a15a-88028a44d4be"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESVONO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToBandHeight" x="120" y="0" width="60" height="20" uuid="94e27b62-4577-47e4-9b85-a44ffc98d708">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6aca091f-4d9c-459c-9dce-912d3f8e8896"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESPYNO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToBandHeight" x="180" y="0" width="117" height="20" uuid="df256161-3ad5-4687-b9fb-fcd3fd1cd39a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a2b4293f-719e-4381-9071-6a35f2ecfacc"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OKCUNM}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToBandHeight" x="297" y="0" width="50" height="20" uuid="3922008d-0f96-4f0a-99e8-f7ee2bd32adf">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce6424ae-17c7-4b3b-9cb5-8b9e0cfa8cfe"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DMBKID}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToBandHeight" x="347" y="0" width="65" height="20" uuid="42a17c9f-8889-4316-afa3-a4b54ec220c1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a69ab44d-e01a-4ab9-8951-f30f2c906181"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DMDRRN}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToBandHeight" x="412" y="0" width="65" height="20" uuid="a711a9b3-21c5-45fd-8c7c-881b80326313">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="47627797-7d44-4094-9942-0a284a49fdfb"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DMDUDT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement stretchType="RelativeToBandHeight" x="477" y="0" width="78" height="20" uuid="26f6b2aa-4407-4a81-9452-cc857ee6b63a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="63e1541b-e751-411b-959c-b3cabdb63f20"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DMCUAM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="70">
+			<staticText>
+				<reportElement x="0" y="20" width="154" height="28" uuid="d1633bdc-5920-4e2d-8358-49fa33c67ef0"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="TH SarabunPSK" size="20"/>
+				</textElement>
+				<text><![CDATA[…………………………………]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="20" width="154" height="28" uuid="ba653513-267e-462c-a2bc-1efc211e5170"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="TH SarabunPSK" size="20"/>
+				</textElement>
+				<text><![CDATA[…………………………………]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="401" y="20" width="154" height="28" uuid="ee08da86-9181-4432-89a6-04c577ea7d6f"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="TH SarabunPSK" size="20"/>
+				</textElement>
+				<text><![CDATA[…………………………………]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="48" width="154" height="22" uuid="188bb8b9-c0c6-4d33-b567-f5d437f82522"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Prepared by]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="48" width="154" height="22" uuid="632a2c59-d684-472c-bd3d-411d1e3f790c"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Verified by]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="401" y="48" width="154" height="22" uuid="6723c192-1e81-4543-82a7-f00713b8a83b"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Confirmed by]]></text>
+			</staticText>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="555" height="20" uuid="80e20ab8-9b13-4202-88f4-d4de69928823"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+				</graphicElement>
+			</rectangle>
+			<textField pattern="#,##0.00">
+				<reportElement x="412" y="0" width="143" height="20" uuid="3469fb92-70c3-46ca-b57e-5fa689609e8c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{DMCUAM1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="347" y="0" width="65" height="20" uuid="723986c9-afcb-413e-b889-512a34a57445"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

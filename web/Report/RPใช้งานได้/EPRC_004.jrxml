@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RC_004" pageWidth="648" pageHeight="504" columnWidth="648" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="cb9e9b52-d92b-49a6-b288-379225b2c2c8">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="M3.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.zoom" value="1.6500000000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="15"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="RCNO" class="java.lang.String"/>
+	<parameter name="CONO" class="java.lang.Integer"/>
+	<parameter name="DIVI" class="java.lang.String"/>
+	<parameter name="THB" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\files\\java_project\\RECEIPT\\web\\Report\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT report.*
+FROM (
+select CASE WHEN dd.RowNumber<=10  OR hh.rowprenum<=10  THEN 1
+WHEN  (dd.RowNumber>(10) AND dd.RowNumber<=(10*2) )  AND    hh.rowprenum<=(10*2) THEN 2
+WHEN  (dd.RowNumber>(10*2) AND dd.RowNumber<=(10*3) )  AND    hh.rowprenum<=(10*3) THEN 3
+WHEN  (dd.RowNumber>(10*3) AND dd.RowNumber<=(10*4) )  AND    hh.rowprenum<=(10*4) THEN 4
+WHEN  (dd.RowNumber>(10*4) AND dd.RowNumber<=(10*5) )  AND    hh.rowprenum<=(10*5) THEN 5
+WHEN  (dd.RowNumber>(10*5) AND dd.RowNumber<=(10*6) )  AND    hh.rowprenum<=(10*6) THEN 6
+WHEN  (dd.RowNumber>(10*6) AND dd.RowNumber<=(10*7) )  AND    hh.rowprenum<=(10*7) THEN 7
+WHEN  (dd.RowNumber>(10*7) AND dd.RowNumber<=(10*8) )  AND    hh.rowprenum<=(10*8) THEN 8
+WHEN  (dd.RowNumber>(10*8) AND dd.RowNumber<=(10*9) )  AND    hh.rowprenum<=(10*9) THEN 9
+WHEN  (dd.RowNumber>(10*9) AND dd.RowNumber<=(10*10) )  AND    hh.rowprenum<=(10*10) THEN 10
+WHEN  (dd.RowNumber>(10*10) AND dd.RowNumber<=(10*11) )  AND    hh.rowprenum<=(10*11) THEN 11
+WHEN  (dd.RowNumber>(10*11) AND dd.RowNumber<=(10*12) )  AND    hh.rowprenum<=(10*12) THEN 12
+WHEN  (dd.RowNumber>(10*12) AND dd.RowNumber<=(10*13) )  AND    hh.rowprenum<=(10*13) THEN 13
+WHEN  (dd.RowNumber>(10*13) AND dd.RowNumber<=(10*14) )  AND    hh.rowprenum<=(10*14) THEN 14
+WHEN  (dd.RowNumber>(10*14) AND dd.RowNumber<=(10*15) )  AND    hh.rowprenum<=(10*15) THEN 15
+WHEN  (dd.RowNumber>(10*15) AND dd.RowNumber<=(10*16) )  AND    hh.rowprenum<=(10*16) THEN 16
+           END AS PAGEPRINT,dd.*
+FROM  BRLDTA0100.ROW_PREREPORT AS hh
+LEFT JOIN (
+SELECT x.*,z.*
+FROM (
+SELECT j.*,COALESCE(k.EXPENSE,0) AS EXPENSE
+FROM (
+SELECT H.summary,(G.HC_REAMT - H.summary) AS BL
+,CASE WHEN RowNumber = 1 THEN CASE WHEN (G.HC_REAMT - H.SUMMARY) > 2 THEN 1
+WHEN ((G.HC_REAMT - H.SUMMARY) <= 2  AND  (G.HC_REAMT - H.SUMMARY) >= -2) AND (G.HC_REAMT - H.SUMMARY) != 0 THEN 2 ELSE 3 END END AS wordbalance
+,G.*,CASE WHEN G.INVDT= 0 THEN '-' ELSE SUBSTR(G.INVDT,7,2) || '-' || SUBSTR(G.INVDT,5,2)|| '-' || SUBSTR(G.INVDT,1,4) END AS LR_INVDT
+FROM (
+SELECT ROW_NUMBER() OVER (PARTITION BY HC_RCNO ) AS RowNumber,A.LR_CONO AS CONO, A.LR_DIVI AS DIVI, A.LR_RCNO AS RCNO,
+A.LR_INVNO AS INVNO, A.LR_INVDT AS INVDT, (A.LR_INVAMT * -1) AS INVAMT, (A.LR_REAMT * -1) as INVREAMT
+,SUBSTR(B.HC_TRDT,7,2) || '-' || SUBSTR(B.HC_TRDT,5,2)|| '-' || SUBSTR(B.HC_TRDT,1,4) AS  HC_TRDT
+,B.HC_PYNO,B.HC_TYPE,B.HC_REAMT,B.HC_BANK,B.HC_ACCODE,B.HC_CHKNO,B.HC_VCNO,(B.HR_BKCHG*-1) AS HR_BKCHG
+,CASE WHEN B.HC_PYDT= 0 THEN '-' ELSE  SUBSTR(B.HC_PYDT,7,2) || '-' || SUBSTR(B.HC_PYDT,5,2)|| '-' || SUBSTR(B.HC_PYDT,1,4) END AS HC_PYDT
+,D.BR_NAMEAC,COALESCE(E.BCBANA,'') AS BCBANA
+,COALESCE(I.RE_DESC,'') AS RE_DESC,CASE WHEN COALESCE(F.PC_PYNO,'') != '' THEN C.ESCUNO ELSE B.HC_PYNO END  AS ADDRCODE
+FROM BRLDTA0100.LR_LINERECEIPT A
+LEFT JOIN BRLDTA0100.HR_RECEIPT B ON B.HR_CONO = A.LR_CONO AND B.HR_DIVI = A.LR_DIVI AND B.HC_RCNO = A.LR_RCNO
+LEFT JOIN M3FDBPRD.FSLEDG C ON C.ESCONO = A.LR_CONO AND C.ESDIVI = A.LR_DIVI AND C.ESJSNO in('1')  AND C.ESCINO = A.LR_INVNO AND C.ESYEA4 = SUBSTRING(A.LR_INVDT,1,4) AND C.ESTRCD = 10
+LEFT JOIN BRLDTA0100.PC_PAYERCUSNO F ON F.PC_CONO = A.LR_CONO AND F.PC_DIVI = A.LR_DIVI AND F.PC_PYNO = B.HC_PYNO AND F.PC_STS = '20'
+LEFT JOIN BRLDTA0100.BANKRECEIPT  D ON  D.BR_CONO = B.HR_CONO AND  D.BR_STATUS = 20 AND D.BR_BANK = B.HC_BANK AND D.BR_ACCODE = B.HC_ACCODE
+LEFT JOIN M3FDBPRD.CBANAC E ON  E.BCCONO = B.HR_CONO AND E.BCBKTP = 2 AND E.BCSTAT = '20' AND E.BCACHO = B.HC_PYNO AND E.BCBKID =  B.HC_BANK
+LEFT JOIN BRLDTA0100.RECEIPT_EXPENSE I ON I.RE_CONO = B.HR_CONO AND I.RE_DIVI = B.HR_DIVI AND I.RE_CODE = A.LR_INVNO
+WHERE A.LR_CONO = $P{CONO}
+AND A.LR_DIVI =$P{DIVI}
+AND A.LR_RCNO = $P{RCNO}
+AND B.HR_CONO = A.LR_CONO
+AND B.HC_RCNO = A.LR_RCNO
+) G LEFT JOIN (
+	  SELECT LR_CONO,LR_DIVI,LR_RCNO,sum(LR_REAMT)*-1 AS summary
+	  FROM BRLDTA0100.LR_LINERECEIPT
+	  GROUP BY LR_CONO,LR_DIVI,LR_RCNO
+) H ON H.LR_CONO = G.CONO AND H.LR_DIVI = G.DIVI AND H.LR_RCNO = G.RCNO
+) J LEFT JOIN (
+            SELECT LRE_CONO,LRE_DIVI,LRE_RCNO,COALESCE(Sum((LRE_AMT*-1)),0) AS EXPENSE
+            FROM BRLDTA0100.LR_LINEEXPEN,BRLDTA0100.RECEIPT_EXPENSE
+            WHERE LRE_CONO = $P{CONO}
+            AND LRE_DIVI =$P{DIVI}
+            AND LRE_RCNO = $P{RCNO}
+            AND LRE_CONO = RE_CONO
+            AND LRE_DIVI = RE_DIVI
+            AND LRE_CODE = RE_CODE
+            GROUP BY LRE_CONO,LRE_DIVI,LRE_RCNO
+) K ON K.LRE_CONO = J.CONO AND K.LRE_DIVI = J.DIVI AND K.LRE_RCNO = J.RCNO
+) X LEFT JOIN (
+SELECT  OKCUNO,OKCONO,TRIM(COALESCE(OKCUNM,'-')) AS OKCUNM,TRIM (OKCUA1) || ' ' ||TRIM (OKCUA2) || ' '|| TRIM (OKCUA3)  AS CUSADDR,
+	OKVRNO,CASE WHEN TRIM(OKCORG) = '' THEN TRIM(OKVRNO) || '' WHEN TRIM(OKCORG) = '00000' THEN 'เลขประจำตัวผู้เสียภาษีอากร : ' || TRIM(OKVRNO) || ' สำนักงานใหญ่ ' ELSE 'เลขประจำตัวผู้เสียภาษีอากร : ' || TRIM(OKVRNO) || ' สาขาที่  ' || TRIM(OKCORG) END AS BRANCH
+	,TRIM(OPCUA1) || ' ' || TRIM (OPCUA2) AS OPCUNM
+	FROM M3FDBPRD.OCUSMA,M3FDBPRD.OCUSAD
+	WHERE OKCONO =$P{CONO}
+	AND OKCONO = OPCONO
+	AND OKCUNO = OPCUNO
+	AND OPADID = 'TNAME'
+) Z ON Z.OKCONO = x.CONO AND Z.OKCUNO = X.ADDRCODE
+) AS dd ON hh.rowprenum = dd.RowNumber) AS report WHERE report.PAGEPRINT IS NOT NULL]]>
+	</queryString>
+	<field name="PAGEPRINT" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="PAGEPRINT"/>
+	</field>
+	<field name="SUMMARY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="SUMMARY"/>
+	</field>
+	<field name="BL" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="BL"/>
+	</field>
+	<field name="WORDBALANCE" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WORDBALANCE"/>
+	</field>
+	<field name="ROWNUMBER" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.label" value="ROWNUMBER"/>
+	</field>
+	<field name="CONO" class="java.math.BigDecimal"/>
+	<field name="DIVI" class="java.lang.String"/>
+	<field name="RCNO" class="java.lang.String"/>
+	<field name="INVNO" class="java.lang.String"/>
+	<field name="INVDT" class="java.math.BigDecimal"/>
+	<field name="INVAMT" class="java.math.BigDecimal"/>
+	<field name="INVREAMT" class="java.math.BigDecimal"/>
+	<field name="HC_TRDT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="HC_TRDT"/>
+	</field>
+	<field name="HC_PYNO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="HC_PYNO"/>
+	</field>
+	<field name="HC_TYPE" class="java.lang.String"/>
+	<field name="HC_REAMT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="HC_REAMT"/>
+	</field>
+	<field name="HC_BANK" class="java.lang.String"/>
+	<field name="HC_ACCODE" class="java.lang.String"/>
+	<field name="HC_CHKNO" class="java.lang.String"/>
+	<field name="HC_VCNO" class="java.lang.String"/>
+	<field name="HR_BKCHG" class="java.math.BigDecimal"/>
+	<field name="HC_PYDT" class="java.lang.String"/>
+	<field name="BR_NAMEAC" class="java.lang.String"/>
+	<field name="BCBANA" class="java.lang.String"/>
+	<field name="RE_DESC" class="java.lang.String"/>
+	<field name="ADDRCODE" class="java.lang.String"/>
+	<field name="LR_INVDT" class="java.lang.String"/>
+	<field name="EXPENSE" class="java.math.BigDecimal"/>
+	<field name="OKCUNO" class="java.lang.String"/>
+	<field name="OKCONO" class="java.math.BigDecimal"/>
+	<field name="OKCUNM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="OKCUNM"/>
+	</field>
+	<field name="CUSADDR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CUSADDR"/>
+	</field>
+	<field name="OKVRNO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="OKVRNO"/>
+	</field>
+	<field name="BRANCH" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BRANCH"/>
+	</field>
+	<field name="OPCUNM" class="java.lang.String"/>
+	<variable name="LR_REAMT1" class="java.math.BigDecimal" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{INVREAMT}]]></variableExpression>
+	</variable>
+	<variable name="LR_INVAMT1" class="java.math.BigDecimal" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{INVAMT}]]></variableExpression>
+	</variable>
+	<variable name="HC_REAMT_1" class="java.math.BigDecimal" calculation="First">
+		<variableExpression><![CDATA[$F{HC_REAMT}]]></variableExpression>
+	</variable>
+	<variable name="SUMMARY1" class="java.math.BigDecimal" calculation="First">
+		<variableExpression><![CDATA[$F{SUMMARY}]]></variableExpression>
+	</variable>
+	<variable name="WORDBALANCE1" class="java.lang.Integer" calculation="First">
+		<variableExpression><![CDATA[$F{WORDBALANCE}]]></variableExpression>
+	</variable>
+	<variable name="WORDBALANCE2" class="java.lang.Integer" calculation="First">
+		<variableExpression><![CDATA[$F{WORDBALANCE}]]></variableExpression>
+	</variable>
+	<variable name="WORDBALANCE3" class="java.lang.Integer" calculation="First">
+		<variableExpression><![CDATA[$F{WORDBALANCE}]]></variableExpression>
+	</variable>
+	<variable name="BL1" class="java.math.BigDecimal" calculation="First">
+		<variableExpression><![CDATA[$F{BL}]]></variableExpression>
+	</variable>
+	<variable name="HC_BANK" class="java.lang.String" calculation="First">
+		<variableExpression><![CDATA[$F{HC_BANK}]]></variableExpression>
+	</variable>
+	<variable name="CHKNO" class="java.lang.String" calculation="First">
+		<variableExpression><![CDATA[$F{HC_CHKNO}]]></variableExpression>
+	</variable>
+	<variable name="HC_PYDT" class="java.lang.String" calculation="First">
+		<variableExpression><![CDATA[$F{HC_PYDT}]]></variableExpression>
+	</variable>
+	<variable name="HC_TYPE" class="java.lang.String" calculation="First">
+		<variableExpression><![CDATA[$F{HC_TYPE}]]></variableExpression>
+	</variable>
+	<variable name="BankDesc" class="java.lang.String" calculation="First">
+		<variableExpression><![CDATA[$F{BR_NAMEAC}]]></variableExpression>
+	</variable>
+	<variable name="voucher" class="java.lang.String" calculation="First">
+		<variableExpression><![CDATA[$F{HC_VCNO}]]></variableExpression>
+	</variable>
+	<variable name="InvAmount" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{INVREAMT}]]></variableExpression>
+	</variable>
+	<variable name="BankCharge" class="java.math.BigDecimal" calculation="First">
+		<variableExpression><![CDATA[$F{HR_BKCHG}]]></variableExpression>
+	</variable>
+	<group name="Group1" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{PAGEPRINT}]]></groupExpression>
+		<groupHeader>
+			<band>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="172" splitType="Stretch">
+			<textField>
+				<reportElement x="36" y="90" width="170" height="26" uuid="dfeee7f1-7acd-4ab8-b564-bb73d8036e18"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRCODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="227" y="86" width="326" height="23" uuid="f9e8bed0-aa05-4ad4-923c-e96b5ce46bc1"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OPCUNM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="227" y="97" width="326" height="15" uuid="60a106ae-c783-43c1-9dd1-31e5f4ae7b84"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="TH SarabunPSK" size="13" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BRANCH}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="67" y="122" width="540" height="30" uuid="1ff4789a-dd60-4a08-9d4f-cb9c192d72ce"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CUSADDR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="472" y="34" width="86" height="20" uuid="1d9991a0-6b78-4530-88a6-2b4386d2d57e"/>
+				<textElement>
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{RCNO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="472" y="57" width="86" height="20" uuid="60d40009-0305-4501-855c-d0fe2c858666"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HC_TRDT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="537" y="34" width="21" height="20" uuid="c1b1e384-64f2-409a-8a03-ecd41b8d8dd5"/>
+				<textElement textAlignment="Right">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="558" y="34" width="38" height="20" uuid="06039ea4-3f62-4960-8d47-dacb625d49a6"/>
+				<textElement>
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="11" y="0" width="56" height="15" uuid="54eb33f3-fac2-40c7-a094-962706b135b7"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ROWNUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="67" y="0" width="245" height="15" uuid="01bc9b5b-19f5-4134-b1a0-17761e6d83fb"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INVNO}.length() > 2 ? "เงินจองเป็ด" : "เงินจองเป็ด"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="313" y="0" width="114" height="15" uuid="f8d38900-768f-49cb-b9c1-c56a1190eaa9">
+					<printWhenExpression><![CDATA[$F{LR_INVDT} != "0" ? true:false]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{HC_TYPE}.equalsIgnoreCase("CASH_DEPOSIT") ? $F{HC_TRDT} : $F{HC_PYDT})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,#00.00" isBlankWhenNull="true">
+				<reportElement x="433" y="0" width="125" height="15" uuid="367ee9ec-e9e4-40c2-9399-3b8e8ba06b0c"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INVREAMT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="181">
+			<textField>
+				<reportElement x="89" y="6" width="346" height="20" uuid="5adcd0bb-54c8-4d80-b204-d12e290c0aac"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $V{InvAmount}.doubleValue() < 0 ? "(" + $P{THB} + ")" : $P{THB} )]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="445" y="6" width="113" height="20" uuid="a08ebea6-6144-4ad5-a653-915a0dfaf9ef"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{InvAmount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="179" y="91" width="108" height="23" uuid="aadb4fbf-5a2d-4b18-be38-55aa2193f24d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CHKNO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="16" y="91" width="128" height="23" uuid="2d310a7f-0d99-4319-8a6c-ee6891e517b9">
+					<printWhenExpression><![CDATA[$V{HC_TYPE}.equalsIgnoreCase("CHECK_DEPOSIT")  ? true : ($V{HC_TYPE}.equalsIgnoreCase("CHECK") ? true :false)]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{HC_BANK}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="442" y="91" width="113" height="23" uuid="16974ed5-e874-4235-a0b2-3208ca480009"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{HC_REAMT_1}.doubleValue() - ($V{BankCharge}.doubleValue() *-1))]]></textFieldExpression>
+			</textField>
+			<line direction="BottomUp">
+				<reportElement x="75" y="54" width="13" height="16" uuid="28ae6171-a1f3-4f0f-9170-fb67e615f3e4">
+					<printWhenExpression><![CDATA[$V{HC_TYPE}.equalsIgnoreCase("CASH_DEPOSIT") ? true : false]]></printWhenExpression>
+				</reportElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="306" y="53" width="13" height="16" uuid="16812126-78d3-4c1b-b83a-9a977382234e">
+					<printWhenExpression><![CDATA[$V{HC_TYPE}.equalsIgnoreCase("CHECK_DEPOSIT") || $V{HC_TYPE}.equalsIgnoreCase("CHECK_EXP")  ? true : false]]></printWhenExpression>
+				</reportElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="183" y="52" width="15" height="16" uuid="ef3237c6-3240-4650-bfae-f955d158b2cb">
+					<printWhenExpression><![CDATA[$V{HC_TYPE}.equalsIgnoreCase("TRANSFER_DEPOSIT") || $V{HC_TYPE}.equalsIgnoreCase("TRANSFER_EXP")  ? true : false]]></printWhenExpression>
+				</reportElement>
+			</line>
+			<textField>
+				<reportElement x="312" y="91" width="120" height="23" uuid="a5e7cf67-8784-4974-b9f0-ee161203c54f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{HC_PYDT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="16" y="91" width="145" height="22" uuid="27e39e5c-f908-424f-b9db-6dd46f76be3d">
+					<printWhenExpression><![CDATA[$V{HC_TYPE}.equalsIgnoreCase("TRANSFER_DEPOSIT")  ? true : ($V{HC_TYPE}.equalsIgnoreCase("TRANSFER") ? true :false)]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{BankDesc}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="333" y="154" width="100" height="20" uuid="002ac407-b962-47b6-b40b-c4aa8c850aa7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{voucher}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="91" y="26" width="228" height="20" uuid="abc615e6-c763-4114-8fbc-596478d8a72d"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ส่วนต่างยอดรับ]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="445" y="26" width="113" height="20" uuid="ec83e87e-af49-4c43-b645-9269c56cfa6e"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{BL1}.doubleValue() + $V{BankCharge}.doubleValue()]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+</jasperReport>

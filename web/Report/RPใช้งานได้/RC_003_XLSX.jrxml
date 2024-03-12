@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RC_004" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4e23e72f-5ef9-40ba-a782-765211c67c99">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="M3.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="ireport.zoom" value="1.3310000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="cono" class="java.lang.Integer"/>
+	<parameter name="divi" class="java.lang.String"/>
+	<parameter name="fromdate" class="java.lang.Integer"/>
+	<parameter name="todate" class="java.lang.Integer"/>
+	<parameter name="locations" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT DALL.*,
+CASE WHEN (DALL.TYPERECEIPT = 'TRANSFER' AND  DALL.HC_STS = '3') AND DALL.RECEIPAMT != 0 THEN DALL.TRANSFER - DALL.ExpenseAmount  ELSE 0 END AS BL_TRANSFER,
+CASE WHEN DALL.TYPERECEIPT = 'CHECK' AND  DALL.HC_STS = '3' AND DALL.RECEIPAMT != 0 THEN DALL.CHECK - DALL.ExpenseAmount  ELSE 0 END AS BL_CHECK
+FROM (
+SELECT B.*,COALESCE(C.ExpenseAmount,0) AS ExpenseAmount
+FROM (
+SELECT ROW_NUMBER() OVER (ORDER BY A.HC_RCNO asc ) AS RowNumber,A.HR_CONO, A.HR_DIVI, A.HC_RCNO, A.HC_TRDT, A.HC_REAMT, A.HC_TYPE,
+	   COALESCE(A.HC_VCNO,'-') AS Voucher, A.HR_BKCHG, A.HC_STS,
+	   CASE WHEN A.HC_STS = '1' THEN 'NOT PRINT' WHEN A.HC_STS = '2' THEN 'PRINTED' WHEN A.HC_STS = '3' THEN 'POSTED' ELSE 'CANCEL' END AS STATUS,
+	   CASE WHEN A.HC_TYPE = 'TRANSFER_EXP' THEN 'TRANSFER' WHEN A.HC_TYPE = 'CHECK_EXP' THEN 'CHECK' ELSE A.HC_TYPE END AS TYPERECEIPT,
+	   CASE WHEN A.HC_STS = '3' THEN A.HC_REAMT - A.HR_BKCHG ELSE 0 END AS RECEIPAMT,
+	   CASE WHEN A.HC_TYPE = 'CASH' AND  A.HC_STS = '3' THEN A.HC_REAMT ELSE 0 END AS CASH,
+	   CASE WHEN (A.HC_TYPE = 'TRANSFER' OR A.HC_TYPE = 'TRANSFER_EXP') AND  A.HC_STS = '3' AND A.HC_REAMT != 0 THEN (A.HC_REAMT - A.HR_BKCHG)  ELSE 0 END AS TRANSFER,
+	   CASE WHEN (A.HC_TYPE = 'CHECK' OR A.HC_TYPE = 'CHECK_EXP') AND  A.HC_STS = '3' AND A.HC_REAMT != 0 THEN (A.HC_REAMT - A.HR_BKCHG) ELSE 0 END AS CHECK,
+	   TRIM(A.HC_PYNO) || ' : ' || TRIM(F.OKCUNM) as CUSNAME
+FROM BRLDTA0100.HR_RECEIPT A
+LEFT JOIN M3FDBPRD.OCUSMA F ON F.OKCUNO = A.HC_PYNO AND F.OKCONO = '10'
+WHERE A.HR_CONO =  $P{cono}
+AND A.HR_DIVI = $P{divi}
+and (A.HC_LOCATION =  $P{locations}  or A.HC_LOCATION is null)
+AND A.HC_TRDT BETWEEN  $P{fromdate}  AND  $P{todate}
+) B LEFT JOIN (
+SELECT LRE_CONO,LRE_DIVI,LRE_RCNO,COALESCE(SUM(LRE_AMT),0) AS ExpenseAmount
+FROM BRLDTA0100.LR_LINEEXPEN
+WHERE LRE_CONO =  $P{cono}
+AND LRE_DIVI =  $P{divi}
+GROUP BY LRE_CONO,LRE_DIVI,LRE_RCNO
+) C ON C.LRE_CONO = B.HR_CONO AND C.LRE_DIVI = B.HR_DIVI AND C.LRE_RCNO = B.HC_RCNO
+) AS DALL]]>
+	</queryString>
+	<field name="ROWNUMBER" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.label" value="ROWNUMBER"/>
+	</field>
+	<field name="HR_CONO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="HR_CONO"/>
+	</field>
+	<field name="HR_DIVI" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="HR_DIVI"/>
+	</field>
+	<field name="HC_RCNO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="HC_RCNO"/>
+	</field>
+	<field name="HC_TRDT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="HC_TRDT"/>
+	</field>
+	<field name="HC_REAMT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="HC_REAMT"/>
+	</field>
+	<field name="HC_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="HC_TYPE"/>
+	</field>
+	<field name="VOUCHER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="VOUCHER"/>
+	</field>
+	<field name="HR_BKCHG" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="HR_BKCHG"/>
+	</field>
+	<field name="HC_STS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="HC_STS"/>
+	</field>
+	<field name="STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="STATUS"/>
+	</field>
+	<field name="TYPERECEIPT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TYPERECEIPT"/>
+	</field>
+	<field name="RECEIPAMT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="RECEIPAMT"/>
+	</field>
+	<field name="CASH" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="CASH"/>
+	</field>
+	<field name="TRANSFER" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TRANSFER"/>
+	</field>
+	<field name="CHECK" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="CHECK"/>
+	</field>
+	<field name="CUSNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CUSNAME"/>
+	</field>
+	<field name="EXPENSEAMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="EXPENSEAMOUNT"/>
+	</field>
+	<field name="BL_TRANSFER" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="BL_TRANSFER"/>
+	</field>
+	<field name="BL_CHECK" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="BL_CHECK"/>
+	</field>
+	<variable name="CASH_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CASH}]]></variableExpression>
+	</variable>
+	<variable name="CHECK_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{BL_CHECK}]]></variableExpression>
+	</variable>
+	<variable name="TRANSFER_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{BL_TRANSFER}]]></variableExpression>
+	</variable>
+	<variable name="RECEIVE" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[($F{HC_REAMT}.floatValue() != 0.00 ? ($F{HC_REAMT}.floatValue() + $F{EXPENSEAMOUNT}.doubleValue()) : 0.00 )]]></variableExpression>
+	</variable>
+	<variable name="SUM_TRANSFER" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[( $F{TRANSFER}.floatValue() != 0.00 ? $F{TRANSFER}.floatValue() : 0.00 )]]></variableExpression>
+	</variable>
+	<variable name="SUM_CHECK" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[( $F{CHECK}.floatValue() != 0.00 ? $F{CHECK}.floatValue()  : 0.00 )]]></variableExpression>
+	</variable>
+	<group name="TYPE">
+		<groupExpression><![CDATA[$F{TYPERECEIPT}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="40">
+			<staticText>
+				<reportElement x="37" y="0" width="63" height="20" uuid="2cb7dbfe-1fcd-4a01-a3c4-698998f46c45"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[From date :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="155" y="0" width="76" height="20" uuid="e3e31670-0882-41ef-8bca-bb1cbe777e42"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[To date :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="0" width="55" height="20" uuid="5abf081a-6617-4990-8c0d-af0fde4039e2"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{fromdate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="231" y="0" width="70" height="20" uuid="4f223400-fe6c-4fad-9426-3c5882d56ed8"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{todate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="20" width="37" height="20" uuid="cfbe8eda-5c9d-407d-b9d3-9b3870160056"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="37" y="20" width="63" height="20" uuid="4e358332-260c-4896-8cfe-46cf93efd845"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Receipt No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="231" y="20" width="70" height="20" uuid="05b20dbb-fa77-4cd8-9709-52af2e19114d"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Receipt Amt]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="301" y="20" width="55" height="20" uuid="7305988c-cb6a-403b-8729-8a16365584c7"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BankCharge]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="356" y="20" width="64" height="20" uuid="47a341e6-294e-417f-aef7-8757397c6dbb"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Expense Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="420" y="20" width="70" height="20" uuid="da513170-5c37-46e6-ac83-9040229d397b"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CASH]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="490" y="20" width="70" height="20" uuid="28bed6f3-b966-46c6-95e1-2355fd7275c6"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TRANSFER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="560" y="20" width="70" height="20" uuid="891d095a-50fe-4eed-9541-02f8fbd8889c"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CHECK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="630" y="20" width="50" height="20" uuid="057def13-9e48-415e-8e07-2c1d90e4530f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TYPERECEIPT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="680" y="20" width="57" height="20" uuid="ad014c54-e7f7-4ded-85c7-e513a0f0d01a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[HC_VCNO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="737" y="20" width="65" height="20" uuid="5d7c4568-dd83-4ac0-a113-722e0a5f51ca"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[HC_STS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="20" width="55" height="20" uuid="699ff263-74cd-45ee-99ab-a4aa062c3cd7"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="155" y="20" width="76" height="20" uuid="98a636c6-d8c0-4431-b11f-76b525c81e31"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Payer]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="37" height="20" uuid="a4d1096a-e123-4a07-a99e-210def07c7fd"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ROWNUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="37" y="0" width="63" height="20" uuid="848c7112-c38a-490d-862e-1ac5faf2c60d"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HC_RCNO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="231" y="0" width="70" height="20" uuid="f4cdc212-d3d0-43de-a48b-b26c4cc9e251"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{HC_REAMT}.floatValue() != 0.00 ? ($F{HC_REAMT}.floatValue() + $F{EXPENSEAMOUNT}.doubleValue()) : 0.00 )]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="301" y="0" width="55" height="20" uuid="b8a936e2-1822-40ee-a629-00356af5b024"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HR_BKCHG}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="356" y="0" width="64" height="20" uuid="386ccca6-312c-49df-b7de-77bc6ff45424"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EXPENSEAMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="420" y="0" width="70" height="20" uuid="9a79c9ba-285d-49c6-bd5f-5e5cbef98d03"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CASH}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="490" y="0" width="70" height="20" uuid="15704c52-1ec8-417b-ae88-fd11a2fd274c"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{TRANSFER}.floatValue() != 0.00 ? $F{TRANSFER}.floatValue() : 0.00 )]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="560" y="0" width="70" height="20" uuid="f202df3b-9bc9-4936-b242-ae184fa40ef2"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{CHECK}.floatValue() != 0.00 ? $F{CHECK}.floatValue()  : 0.00 )]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="630" y="0" width="50" height="20" uuid="1634b9f7-d1a3-490e-9628-f6c40384fa0f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TYPERECEIPT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="680" y="0" width="57" height="20" uuid="3c10dba2-0d77-4946-9fc8-bf5836449d2e"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VOUCHER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="737" y="0" width="65" height="20" uuid="2fd575f9-040d-4fc8-acd1-2c78122209b0"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STATUS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="0" width="55" height="20" uuid="70f64dc3-6501-497c-9afd-2b150ae4690d"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HC_TRDT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="155" y="0" width="76" height="20" uuid="1566989c-7e10-4de9-8c38-934fc4f30162"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CUSNAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="420" y="0" width="70" height="20" uuid="3e1ff064-7b3c-470a-a445-97226fcde6e7"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CASH_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="490" y="0" width="70" height="20" uuid="e3dd2666-9e8d-4383-8f77-32d9fdc6dac3"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SUM_TRANSFER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="560" y="0" width="70" height="20" uuid="9019553d-3fd6-42de-b0b3-36d5f70513c9"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SUM_CHECK}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
